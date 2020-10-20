@@ -37,4 +37,4 @@ class Order {
   toSimpleOutput() { return { orderId: this.orderId, isFraudulent: this.isFraudulent } }
 }
 
-module.exports = { Order }
+module.exports = Order

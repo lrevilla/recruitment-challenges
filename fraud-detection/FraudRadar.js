@@ -1,7 +1,8 @@
 const fs = require('fs')
 const path = require('path')
+const Order = require('./entities/order')
+const OrderList = require('./entities/OrderList')
 const { FILES_PATH } = require('./utils/constants')
-const { Order } = require('./entities/order')
 
 exports.Check = fileName => {
   // READ FRAUD LINES
@@ -9,24 +10,8 @@ exports.Check = fileName => {
   const lines = fileContent.split('\n')
   const orders = lines.map(line => new Order(...line.split(',')))
 
-  // CHECK FRAUD
-  orders.forEach(currentOrder => {
-    if (currentOrder.isFraudulent) return
-
-    orders
-      .filter(order =>
-        order.dealId === currentOrder.dealId &&
-        order.orderId !== currentOrder.orderId &&
-        order.creditCard !== currentOrder.creditCard
-      )
-      .filter(order =>
-        order.email === currentOrder.email ||
-        order.getFullAddress() === currentOrder.getFullAddress()
-      )
-      .forEach(order => { order.isFraudulent = true })
-  })
-
-  return orders
-    .filter(order => order.isFraudulent)
+  const orderList = new OrderList(orders)
+  return orderList
+    .getFraudulentOrders()
     .map(order => order.toSimpleOutput())
 }
