@@ -11,7 +11,5 @@ exports.Check = fileName => {
   const orders = lines.map(line => new Order(...line.split(',')))
 
   const orderList = new OrderList(orders)
-  return orderList
-    .getFraudulentOrders()
-    .map(order => order.toSimpleOutput())
+  return orderList.getFraudulentOrders()
 }

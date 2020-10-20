@@ -33,8 +33,6 @@ class Order {
   }
 
   getFullAddress() { return `${this.street}, ${this.city}, ${this.state} ${this.zipCode}` }
-
-  toSimpleOutput() { return { orderId: this.orderId, isFraudulent: this.isFraudulent } }
 }
 
 module.exports = Order
