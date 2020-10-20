@@ -26,7 +26,7 @@ class Order {
 
     let [recipient, domain] = this.email.split('@')
     recipient = recipient.replace('.', '')
-    const recipientMatch = recipient.match(/^(?<recipient>\w+)((?<plus_sign_fragment>\+\w+)|)/)
+    const recipientMatch = recipient.match(/^(?<recipient>\w+)((?<plus_symbol_fragment>\+\w+)|)/)
     if (recipientMatch.groups && recipientMatch.groups.recipient) recipient = recipientMatch.groups.recipient
 
     this.email = `${recipient}@${domain}`
