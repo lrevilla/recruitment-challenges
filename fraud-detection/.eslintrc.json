@@ -5,6 +5,7 @@
         "describe": false
     },
     "rules": {
-        "space-before-function-paren": "warn"
+        "space-before-function-paren": "warn",
+        "operator-linebreak": "off"
     }
 }
