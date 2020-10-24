@@ -12,3 +12,12 @@ exports.STATES = {
 }
 
 exports.FILES_PATH = path.join(__dirname, '..', 'Files')
+
+exports.CHECK_FNS = {
+  IS: (firstValue, secondValue) => firstValue === secondValue,
+  IS_NOT: (firstValue, secondValue) => firstValue !== secondValue,
+  IS_NOT_IN: (firstValue, secondValue) => {
+    if (!Array.isArray(secondValue)) return true
+    return !secondValue.includes(firstValue)
+  }
+}

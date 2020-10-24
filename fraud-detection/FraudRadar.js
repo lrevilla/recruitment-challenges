@@ -1,15 +1,27 @@
-const fs = require('fs')
-const path = require('path')
-const Order = require('./entities/order')
-const OrderList = require('./entities/OrderList')
-const { FILES_PATH } = require('./utils/constants')
+const OrderRepository = require('./repositories/order.repository')
+const { CHECK_FNS: { IS, IS_NOT, IS_NOT_IN } } = require('./utils/constants')
 
-exports.Check = fileName => {
-  // READ FRAUD LINES
-  const fileContent = fs.readFileSync(path.join(FILES_PATH, fileName), 'utf8')
-  const lines = fileContent.split('\n')
-  const orders = lines.map(line => new Order(...line.split(',')))
+exports.Check = async fileName => {
+  const ordersRepo = new OrderRepository()
+  await ordersRepo.createFromFile(fileName)
 
-  const orderList = new OrderList(orders)
-  return orderList.getFraudulentOrders()
+  // Check and mark fraudulent orders
+  const processedOrderIds = []
+  ordersRepo.find().forEach(order => {
+    ordersRepo.find([
+      { property: 'isFraudulent', checkFn: IS, value: false },
+      { property: 'orderId', checkFn: IS_NOT_IN, value: [...processedOrderIds, order.orderId] },
+      { property: 'dealId', checkFn: IS, value: order.dealId },
+      { property: 'creditCard', checkFn: IS_NOT, value: order.creditCard }
+    ])
+      .filter(machingOrder =>
+        machingOrder.email === order.email ||
+        machingOrder.getFullAddress() === order.getFullAddress()
+      )
+      .forEach(fraudulentOrder => ordersRepo.update(fraudulentOrder.orderId, { isFraudulent: true }))
+
+    processedOrderIds.push(order.orderId)
+  })
+
+  return ordersRepo.find({ property: 'isFraudulent', checkFn: IS, value: true })
 }

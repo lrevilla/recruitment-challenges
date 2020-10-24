@@ -9,30 +9,30 @@ const ORDER_FILE_NAMES = {
 }
 
 describe('Fraud Radar', function () {
-  it('Should process the one line file', function () {
-    const result = FraudRadar.Check(ORDER_FILE_NAMES.ONE_LINE)
+  it('Should process the one line file', async function () {
+    const result = await FraudRadar.Check(ORDER_FILE_NAMES.ONE_LINE)
     assert.ok(result)
     assert.strictEqual(result.length, 0)
   })
 
-  it('Should process the two line file in which the second is fraudulent', function () {
-    const result = FraudRadar.Check(ORDER_FILE_NAMES.TWO_LINES)
+  it('Should process the two line file in which the second is fraudulent', async function () {
+    const result = await FraudRadar.Check(ORDER_FILE_NAMES.TWO_LINES)
     assert.ok(result)
     assert.strictEqual(result.length, 1)
     assert.strictEqual(result[0].isFraudulent, true)
     assert.strictEqual(result[0].orderId, 2)
   })
 
-  it('Should process the three line file in which the second is fraudulent', function () {
-    const result = FraudRadar.Check(ORDER_FILE_NAMES.THREE_LINES)
+  it('Should process the three line file in which the second is fraudulent', async function () {
+    const result = await FraudRadar.Check(ORDER_FILE_NAMES.THREE_LINES)
     assert.ok(result)
     assert.strictEqual(result.length, 1)
     assert.strictEqual(result[0].isFraudulent, true)
     assert.strictEqual(result[0].orderId, 2)
   })
 
-  it('Should process the four line file in which more than one order is fraudulent', function () {
-    const result = FraudRadar.Check(ORDER_FILE_NAMES.FOUR_LINES)
+  it('Should process the four line file in which more than one order is fraudulent', async function () {
+    const result = await FraudRadar.Check(ORDER_FILE_NAMES.FOUR_LINES)
     assert.ok(result)
     assert.strictEqual(result.length, 2)
     const fraudulentOrderIds = [2, 4]
