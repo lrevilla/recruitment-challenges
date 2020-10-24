@@ -3,8 +3,15 @@ const assert = require('assert')
 
 describe('PositiveBitCounter', function () {
   it('Should return a RangeError when a negative value is supplied', function () {
-    assert.throws(() => PositiveBitCounter.Count(-2),
-      function isRangeError(error) { return (error instanceof RangeError) })
+    assert.throws(() => PositiveBitCounter.Count(-2), error => error instanceof RangeError)
+  })
+
+  it('Should return a RangeError when a Infinity value is supplied', function () {
+    assert.throws(() => PositiveBitCounter.Count(Infinity), error => error instanceof RangeError)
+  })
+
+  it('Should return a TypeError when a not-number value is supplied', function () {
+    assert.throws(() => PositiveBitCounter.Count('thisIsNotANumber'), error => error instanceof TypeError)
   })
 
   it('Should return zero occurrences for input = 0', function () {

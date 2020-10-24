@@ -4,6 +4,9 @@
         "it": false,
         "describe": false
     },
+    "env": {
+        "es2020": true
+    },
     "rules": {
         "space-before-function-paren": "warn",
         "operator-linebreak": "off"
