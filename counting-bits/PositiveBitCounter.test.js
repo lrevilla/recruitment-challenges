@@ -31,4 +31,16 @@ describe('PositiveBitCounter', function () {
     const actual = PositiveBitCounter.Count(161)
     assert.deepStrictEqual(actual, expected)
   })
+
+  it('Should return the expected count for input = 2147483647', function () {
+    const expected = [
+      31, 0, 1, 2, 3, 4, 5, 6, 7,
+      8, 9, 10, 11, 12, 13, 14, 15, 16,
+      17, 18, 19, 20, 21, 22, 23, 24, 25,
+      26, 27, 28, 29, 30
+    ]
+
+    const actual = PositiveBitCounter.Count(2147483647)
+    assert.deepStrictEqual(actual, expected)
+  })
 })
