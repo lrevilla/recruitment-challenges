@@ -20,7 +20,7 @@ const findIndexOfBitAtPossition = (number, position) => {
 exports.Count = input => {
   if (isNaN(input)) throw new TypeError()
   const integerInput = BigInt(input, 10)
-  if (integerInput < 0 | integerInput === Infinity) throw new RangeError()
+  if (integerInput < 0 || integerInput === Infinity) throw new RangeError()
 
   let bitCount = input - ((input >> 1) & BINARY_MASKS.GROUP_BY_1_BIT.hex)
   bitCount = ((bitCount >> BINARY_MASKS.GROUP_BY_2_BITS.dec) & BINARY_MASKS.GROUP_BY_2_BITS.hex) +
