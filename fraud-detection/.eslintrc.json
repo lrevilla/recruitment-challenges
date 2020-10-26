@@ -3,5 +3,9 @@
     "globals": {
         "it": false,
         "describe": false
+    },
+    "rules": {
+        "space-before-function-paren": "warn",
+        "operator-linebreak": "off"
     }
 }
