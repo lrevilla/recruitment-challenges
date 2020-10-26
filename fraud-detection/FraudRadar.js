@@ -1,74 +1,27 @@
-const fs = require('fs')
+const OrderRepository = require('./repositories/order.repository')
+const { CHECK_FNS: { IS, IS_NOT, IS_NOT_IN } } = require('./utils/constants')
 
-function Check (filePath) {
-  // READ FRAUD LINES
-  let orders = []
-  let fraudResults = []
+exports.Check = async fileName => {
+  const ordersRepo = new OrderRepository()
+  await ordersRepo.createFromFile(fileName)
 
-  let fileContent = fs.readFileSync(filePath, 'utf8')
-  let lines = fileContent.split('\n')
-  for (let line of lines) {
-    let items = line.split(',')
-    let order = {
-      orderId: Number(items[0]),
-      dealId: Number(items[1]),
-      email: items[2].toLowerCase(),
-      street: items[3].toLowerCase(),
-      city: items[4].toLowerCase(),
-      state: items[5].toLowerCase(),
-      zipCode: items[6],
-      creditCard: items[7]
-    }
-    orders.push(order)
-  }
+  // Check and mark fraudulent orders
+  const processedOrderIds = []
+  ordersRepo.find().forEach(order => {
+    ordersRepo.find([
+      { property: 'isFraudulent', checkFn: IS, value: false },
+      { property: 'orderId', checkFn: IS_NOT_IN, value: [...processedOrderIds, order.orderId] },
+      { property: 'dealId', checkFn: IS, value: order.dealId },
+      { property: 'creditCard', checkFn: IS_NOT, value: order.creditCard }
+    ])
+      .filter(machingOrder =>
+        machingOrder.email === order.email ||
+        machingOrder.getFullAddress() === order.getFullAddress()
+      )
+      .forEach(fraudulentOrder => ordersRepo.update(fraudulentOrder.orderId, { isFraudulent: true }))
 
-  // NORMALIZE
-  for (let order of orders) {
-    // Normalize email
-    let aux = order.email.split('@')
-    let atIndex = aux[0].indexOf('+')
-    aux[0] = atIndex < 0 ? aux[0].replace('.', '') : aux[0].replace('.', '').substring(0, atIndex - 1)
-    order.email = aux.join('@')
+    processedOrderIds.push(order.orderId)
+  })
 
-    // Normalize street
-    order.street = order.street.replace('st.', 'street').replace('rd.', 'road')
-
-    // Normalize state
-    order.state = order.street.replace('il', 'illinois').replace('ca', 'california').replace('ny', 'new york')
-  }
-
-  // CHECK FRAUD
-  for (let i = 0; i < orders.length; i++) {
-    let current = orders[i]
-    let isFraudulent = false
-
-    for (let j = i + 1; j < orders.length; j++) {
-      isFraudulent = false
-      if (current.dealId === orders[j].dealId
-        && current.email === orders[j].email
-        && current.creditCard !== orders[j].creditCard) {
-          isFraudulent = true
-        }
-      
-      if (current.dealId === orders[j].dealId
-        && current.state === orders[j].state
-        && current.zipCode === orders[j].zipCode
-        && current.street === orders[j].street
-        && current.city === orders[j].city
-        && current.creditCard !== orders[j].creditCard) {
-          isFraudulent = true
-        }
-      
-      if (isFraudulent) {
-        fraudResults.push({
-          isFraudulent: true,
-          orderId: orders[j].orderId
-        })
-      }
-    }
-  }
-
-  return fraudResults
+  return ordersRepo.find({ property: 'isFraudulent', checkFn: IS, value: true })
 }
-
-module.exports = { Check }
