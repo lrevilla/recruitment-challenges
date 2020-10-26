@@ -18,7 +18,7 @@ class Order {
 
   normalize() {
     const state = Object.values(STATES).find(stateValue => stateValue.SHORT === this.state)
-    this.state = state?.LONG ? state.LONG : this.state
+    this.state = state && state.LONG ? state.LONG : this.state
 
     this.street = this.street
       .replace(STREET_TYPES.STREET.SHORT, STREET_TYPES.STREET.LONG)
